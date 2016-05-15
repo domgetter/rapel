@@ -10,5 +10,6 @@ require "rapel"
 # require "pry"
 # Pry.start
 
-require "irb"
-IRB.start
+Rapel.start
+# require "irb"
+# IRB.start
