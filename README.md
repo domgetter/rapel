@@ -20,7 +20,87 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Place the following in a file named `my_rapel_server.rb`
+
+```ruby
+
+require 'rapel'
+Rapel.start
+
+```
+
+Then run the server
+
+```bash
+ruby my_rapel_server.rb
+```
+
+Place the following in your `.vimrc`
+
+```
+function! g:get_last_line_visual_selection()
+  " Why is this not a built-in Vim script function?!
+  let [lnum, col] = getpos("'>")[1:2]
+  return lnum
+endfunction
+
+function! g:get_visual_selection()
+  " Why is this not a built-in Vim script function?!
+  let [lnum1, col1] = getpos("'<")[1:2]
+  let [lnum2, col2] = getpos("'>")[1:2]
+  let lines = getline(lnum1, lnum2)
+  let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+  let lines[0] = lines[0][col1 - 1:]
+  return join(lines, "\n")
+endfunction
+
+ruby << EOF
+  require 'json'
+  require 'socket'
+  begin
+    $server = TCPSocket.new('localhost', 8091)
+  rescue Errno::ECONNREFUSED
+    puts "No Rapel server found"
+  end
+  def send_exp(exp)
+    raise "No Rapel server found" unless $server
+    $server.puts({:op => "eval", :code => exp}.to_json)
+    JSON.parse($server.gets.chomp)["result"]
+  rescue
+    $!.inspect
+  end
+
+  def send_current_selection
+    expression = Vim.evaluate("g:get_visual_selection()")
+    send_exp(expression)
+  end
+
+  def send_and_print_below
+    line_number = Vim.evaluate("g:get_last_line_visual_selection()")
+    expression = Vim.evaluate("g:get_visual_selection()")
+    result = send_exp(expression)
+    Vim::Buffer.current.append(line_number, "\#=> " + result)
+  end
+EOF
+
+vmap <leader>s :ruby puts send_current_selection<CR>
+vmap <leader>S :ruby send_and_print_below<CR>
+```
+
+Now open a blank file in vim, and place the following on its own line
+
+```
+2+2
+```
+
+Then press Shift+V to select the line, then press leader (default backslash) Shift-S, and voila!
+
+```
+2+2
+#=> 4
+```
+
+The evaluated expression will appear beneath your expression!
 
 ## Development
 
