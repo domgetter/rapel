@@ -37,7 +37,7 @@ ruby my_rapel_server.rb
 
 Place the following in your `.vimrc`
 
-```
+```vim
 function! g:get_last_line_visual_selection()
   " Why is this not a built-in Vim script function?!
   let [lnum, col] = getpos("'>")[1:2]
