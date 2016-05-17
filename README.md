@@ -35,7 +35,7 @@ Then run the server
 ruby my_rapel_server.rb
 ```
 
-To connect, you'll need a client.  Here's one for vim called [vim-rapel-client](github.com/domgetter/vim-rapel-client).
+To connect, you'll need a client.  Here's one for vim called [vim-rapel-client](https://github.com/domgetter/vim-rapel-client).
 Once you've installed the plugin, place the following in your `.vimrc`
 
 ```vim
